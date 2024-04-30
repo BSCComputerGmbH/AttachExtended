@@ -1,0 +1,6 @@
+[
+  {
+    "name" : "com.gluonhq.attachextended.nfc.impl.AndroidNfcService",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  }
+]

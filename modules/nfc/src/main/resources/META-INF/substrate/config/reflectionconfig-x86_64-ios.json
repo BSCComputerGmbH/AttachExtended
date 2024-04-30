@@ -1,0 +1,6 @@
+[
+  {
+    "name" : "com.gluonhq.attachextended.nfc.impl.IOSNfcService",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  }
+]

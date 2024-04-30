@@ -12,3 +12,7 @@ rootProject.name = 'attach-extended'
 include 'log'
 
 project(':log').projectDir                     = file('modules/log')
+
+include 'nfc'
+
+project(':nfc').projectDir                     = file('modules/nfc')

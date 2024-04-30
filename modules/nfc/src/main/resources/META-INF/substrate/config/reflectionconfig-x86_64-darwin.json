@@ -1,0 +1,6 @@
+[
+  {
+    "name" : "com.gluonhq.attachextended.nfc.impl.DesktopNfcService",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
+  }
+]

@@ -1,0 +1,6 @@
+dependencies {
+    implementation "com.gluonhq.attach:util:$libraryVersions.attach"
+}
+
+ext.moduleName = 'com.gluonhq.attachextended.nfc'
+ext.description = 'Platform API to access NFC features'

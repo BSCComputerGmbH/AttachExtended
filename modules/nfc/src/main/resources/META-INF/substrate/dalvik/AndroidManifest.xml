@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding="utf-8"?>
+<manifest xmlns:android='http://schemas.android.com/apk/res/android' xmlns:tools="http://schemas.android.com/tools" package='com.gluonhq.helloandroid'>
+    <uses-sdk android:minSdkVersion="21" />
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-feature android:name="android.hardware.nfc" android:required="true" />
+
+    <application>
+        <activity android:name="com.gluonhq.helloandroid.nfc.NFCReceiver"
+                  android:exported="true">
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+            <meta-data android:name="android.nfc.action.TECH_DISCOVERED"
+                       android:resource="@xml/nfc_tech_list" /> 
+        </activity>
+    </application>
+</manifest>
+
