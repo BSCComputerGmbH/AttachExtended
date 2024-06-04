@@ -35,13 +35,12 @@ public class AndroidNfcService implements NfcService {
         System.loadLibrary("nfc");
     }
 
-    @Override
-    public void log(String message) {
-        if (message != null && !message.isEmpty()) {
-            logMessage(message);
-        }
-    }
-    
-    private native void logMessage(String message);
+    private native void sendMessage(String message);
+
+	@Override
+	public void doConnect(String optionalDataToSend) {
+		sendMessage(optionalDataToSend);
+		
+	}
     
 }

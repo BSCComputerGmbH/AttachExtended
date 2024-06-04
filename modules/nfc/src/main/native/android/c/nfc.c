@@ -68,7 +68,7 @@ JNI_OnLoad_nfc(JavaVM *vm, void *reserved)
 
 // from Java to Android
 
-JNIEXPORT void JNICALL Java_com_gluonhq_attachextended_nfc_impl_AndroidNfcService_logMessage
+JNIEXPORT void JNICALL Java_com_gluonhq_attachextended_nfc_impl_AndroidNfcService_sendMessage
 (JNIEnv *env, jclass jClass, jstring jmessage)
 {
     const char *messageChars = (*env)->GetStringUTFChars(env, jmessage, NULL);

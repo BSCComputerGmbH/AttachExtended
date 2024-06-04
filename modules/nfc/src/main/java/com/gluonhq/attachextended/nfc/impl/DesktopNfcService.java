@@ -36,9 +36,10 @@ public class DesktopNfcService implements NfcService {
 
     private static final Logger LOG = Logger.getLogger(DesktopNfcService.class.getName());
 
-    @Override
-    public void log(String message) {
-        LOG.log(Level.INFO, message);
-    }
+	@Override
+	public void doConnect(String optionalDataToSend) {
+		// TODO Auto-generated method stub
+		
+	}
     
 }

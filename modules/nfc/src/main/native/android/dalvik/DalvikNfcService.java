@@ -39,12 +39,57 @@ public class DalvikNfcService {
 
     private final Activity activity;
     private final boolean debug;
-
+    
+    private Intent intent;
+    
     public DalvikNfcService(Activity activity) {
         this.activity = activity;
         this.debug = Util.isDebug();
+        
+        intent = new Intent(NFC.ACTION);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        
+        
+    }
+    
+    public void doConnectWithNFC(String optionalDataToSend)
+    {
+    // Gluon eigenes Ding aus dem Util Paket
+        IntentHandler intentHandler = new IntentHandler(){
+
+            @Override
+            public void gotActivityResult(int requestCode, int resultCode, Intent intent) {
+                System.out.println("DalvikNFCService#gotActivityResult " + intent.toString());
+                //TODO nur dann wenn es wirklich auf startActivitForResult hinausläuft.
+                if (resultCode == Activity.RESULT_OK) {
+                    //TODO key String
+                    String result = (String) intent.getExtras().get("SCAN_RESULT");
+
+
+                    //TODO
+                    nativeSetMessageToApplication(result);
+                }
+
+
+            }
+        };
+        Util.setOnActivityResultHandler(intentHandler);
+       
+        this.activity.startActivityForResult(intent, Activity.RESULT_OK);
+
     }
 
+
+    private void nativeSetMessageToApplication(String resultFromNFCSensor)
+    {
+        //TODO hier wieder die spätere brücke ansprechen
+        //im moment die fakeLib
+        NativeFakeLibrary.setMessageResult(resultFromNFCSensor);
+
+    }
+
+    /* TODO raus
     private void log(String message) {
         if (message == null || message.isEmpty()) {
             Log.e(TAG, "Invalid message: message was null or empty");
@@ -54,5 +99,5 @@ public class DalvikNfcService {
             Log.d(TAG, "Logging message: " + message);
         }
         Log.v(TAG, message);
-    }
+    }*/
 }

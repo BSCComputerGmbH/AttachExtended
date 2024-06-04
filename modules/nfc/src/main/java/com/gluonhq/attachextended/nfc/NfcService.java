@@ -39,11 +39,7 @@ public interface NfcService {
     static Optional<NfcService> create() {
         return Services.get(NfcService.class);
     }
-
-    /**
-     * Logs a message to console.
-     *
-     * @param message A string to be logged.
-     */
-    void log(String message);
+    
+    
+    public void doConnect(String optionalDataToSend);
 }

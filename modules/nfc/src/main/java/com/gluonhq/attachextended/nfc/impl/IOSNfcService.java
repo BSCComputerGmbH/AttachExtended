@@ -35,13 +35,16 @@ public class IOSNfcService implements NfcService {
         System.loadLibrary("Nfc");
     }
 
-    @Override
-    public void log(String message) {
-        if (message != null && !message.isEmpty()) {
-            logMessage(message);
-        }
-    }
+  
     
-    private native void logMessage(String message);
+    private native void sendMessage(String message);
+
+
+
+	@Override
+	public void doConnect(String optionalDataToSend) {
+		// TODO Auto-generated method stub
+		
+	}
     
 }
