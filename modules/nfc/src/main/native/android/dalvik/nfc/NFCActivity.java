@@ -1,4 +1,4 @@
-package de.bsc.nfc_testandroid.android_native;
+package com.gluonhq.helloandroid.nfc;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -12,26 +12,21 @@ import android.provider.Settings;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.ComponentActivity;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-
-import de.bsc.nfc_testandroid.R;
 //TODO Umbau so, dass alle Informationen wieder zur Applikation gebracht werden und nicht in dieser Ansicht angezeigt werden.
-public class NFCActivity extends ComponentActivity
+public class NFCActivity extends Activity
 {
 
     private NfcAdapter nfcAdapter;
 
-    private TextView textView;
+    //private TextView textView;
 
     private PendingIntent pendingIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.nfcreicever);
+       // setContentView(R.layout.nfcreicever);
 
-        textView = findViewById(R.id.tag_viewer_text);
+       // textView = findViewById(R.id.tag_viewer_text);
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         //TODO Methode die das null nach "oben" befördert bzw. die Fehlermeldung
@@ -45,7 +40,7 @@ public class NFCActivity extends ComponentActivity
         pendingIntent = PendingIntent.getActivity(this, 0, new android.content.Intent(this, this.getClass()).addFlags(
                 android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_MUTABLE);
 
-
+/*
 
         ActivityResultLauncher<Intent> activity01Launcher =
                 registerForActivityResult(new
@@ -53,7 +48,7 @@ public class NFCActivity extends ComponentActivity
                         (result) -> {
                             System.out.println("result incoming " );
                         }
-                );
+                );*/
     }
 
     @Override
@@ -170,7 +165,26 @@ public class NFCActivity extends ComponentActivity
 
             //textView.setText(message.toString());
         }
-        textView.setText(sb.toString());
+        //textView.setText(sb.toString());
     }
+
+
+
+    /* TODO raus
+    @Override
+    public void initNFC(String optionalerPinCode) {
+
+    }
+
+    @Override
+    public void addListener(INFCListener iNFCListener) {
+        this.iNFCListener = iNFCListener;
+    }
+
+    @Override
+    public void removeListener(INFCListener iNFCListener) {
+        this.iNFCListener = null;
+    }*/
+
 
 }

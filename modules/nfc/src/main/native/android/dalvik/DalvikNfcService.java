@@ -33,6 +33,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
+import com.gluonhq.helloandroid.nfc.Intent.NFC;
+
 public class DalvikNfcService {
 
     private static final String TAG = Util.TAG;
@@ -85,19 +87,9 @@ public class DalvikNfcService {
     {
         //TODO hier wieder die spätere brücke ansprechen
         //im moment die fakeLib
-        NativeFakeLibrary.setMessageResult(resultFromNFCSensor);
+        //NativeFakeLibrary.setMessageResult(resultFromNFCSensor);
 
     }
 
-    /* TODO raus
-    private void log(String message) {
-        if (message == null || message.isEmpty()) {
-            Log.e(TAG, "Invalid message: message was null or empty");
-            return;
-        }
-        if (debug) {
-            Log.d(TAG, "Logging message: " + message);
-        }
-        Log.v(TAG, message);
-    }*/
+   
 }
