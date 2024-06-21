@@ -16,3 +16,7 @@ project(':log').projectDir                     = file('modules/log')
 include 'nfc'
 
 project(':nfc').projectDir                     = file('modules/nfc')
+
+include 'share'
+
+project(':share').projectDir                     = file('modules/share')
