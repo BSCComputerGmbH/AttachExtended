@@ -27,12 +27,17 @@
  */
 package com.gluonhq.attachextended.nfc.impl;
 
+
+
 import com.gluonhq.attachextended.nfc.NfcService;
 
 public class AndroidNfcService implements NfcService {
 
+	
     static {
-        System.loadLibrary("nfc");
+    	System.out.println("AndroidNfcService static auruf");
+    	System.loadLibrary("nfc");
+    	System.out.println("AndroidNfcService static nch lib Laderei");
     }
 
     private native void sendMessage(String message);
