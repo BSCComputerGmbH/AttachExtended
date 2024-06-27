@@ -35,7 +35,9 @@ public class IOSNfcService implements NfcService {
         System.loadLibrary("Nfc");
     }
 
-  
+
+    public IOSNfcService() {
+    }
     
     private native void sendMessage(String message);
 

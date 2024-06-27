@@ -40,6 +40,9 @@ public class AndroidNfcService implements NfcService {
     	System.out.println("AndroidNfcService static nch lib Laderei");
     }
 
+    public AndroidNfcService() {
+    }
+
     private native void sendMessage(String message);
 
 	@Override

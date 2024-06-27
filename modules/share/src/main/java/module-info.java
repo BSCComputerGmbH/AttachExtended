@@ -31,4 +31,7 @@ module com.gluonhq.attach.share {
 
     exports com.gluonhq.attach.share;
     exports com.gluonhq.attach.share.impl to com.gluonhq.attach.util;
+    
+    exports com.gluonhq.attachextended.nfc;
+    exports com.gluonhq.attachextended.nfc.impl to com.gluonhq.attach.util;
 }
