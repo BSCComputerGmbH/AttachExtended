@@ -35,7 +35,7 @@ static void initializeDalvikHandles() {
     jNfcServiceClass = GET_REGISTER_DALVIK_CLASS(jNfcServiceClass, "com/gluonhq/helloandroid/DalvikNfcService");
     ATTACH_DALVIK();
     jmethodID jNfcServiceInitMethod = (*dalvikEnv)->GetMethodID(dalvikEnv, jNfcServiceClass, "<init>", "(Landroid/app/Activity;)V");
-    jNfcServiceCallMethod = (*dalvikEnv)->GetMethodID(dalvikEnv, jNfcServiceClass, "nfc", "(Ljava/lang/String;)V");
+    jNfcServiceCallMethod = (*dalvikEnv)->GetMethodID(dalvikEnv, jNfcServiceClass, "doConnectWithNFC", "(Ljava/lang/String;)V");
 
     jobject jActivity = substrateGetActivity();
     jobject jtmpobj = (*dalvikEnv)->NewObject(dalvikEnv, jNfcServiceClass, jNfcServiceInitMethod, jActivity);
