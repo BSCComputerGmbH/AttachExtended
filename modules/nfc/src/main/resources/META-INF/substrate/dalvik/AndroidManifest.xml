@@ -5,7 +5,7 @@
     <uses-feature android:name="android.hardware.nfc" android:required="true" />
 
     <application>
-        <activity android:name="com.gluonhq.helloandroid.nfc.NFCReceiver"
+        <activity android:name="com.gluonhq.helloandroid.nfc.NFCActivity"
                   android:exported="true">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
