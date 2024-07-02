@@ -35,9 +35,7 @@ public class AndroidNfcService implements NfcService {
 
 	
     static {
-    	System.out.println("AndroidNfcService static auruf");
     	System.loadLibrary("nfc");
-    	System.out.println("AndroidNfcService static nch lib Laderei");
     }
 
     public AndroidNfcService() {

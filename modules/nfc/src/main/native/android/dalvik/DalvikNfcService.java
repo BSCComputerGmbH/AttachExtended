@@ -55,13 +55,19 @@ public class DalvikNfcService {
         
     }
     
+    
     public void doConnectWithNFC(String optionalDataToSend)
     {
+    	
+    	System.out.println("DalvikNFCService#doConnectWithNFC " + optionalDataToSend);
     // Gluon eigenes Ding aus dem Util Paket
         IntentHandler intentHandler = new IntentHandler(){
 
             @Override
             public void gotActivityResult(int requestCode, int resultCode, Intent intent) {
+            	
+            	//TODO mit dem Activity Result passt was nicht
+            	
                 System.out.println("DalvikNFCService#gotActivityResult " + intent.toString());
                 //TODO nur dann wenn es wirklich auf startActivitForResult hinausläuft.
                 if (resultCode == Activity.RESULT_OK) {
@@ -77,7 +83,8 @@ public class DalvikNfcService {
             }
         };
         Util.setOnActivityResultHandler(intentHandler);
-       
+        //hier kommt die MainActivity raus
+        System.out.println("DalvikNFC " + this.activity.toString());
         this.activity.startActivityForResult(intent, Activity.RESULT_OK);
 
     }

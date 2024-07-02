@@ -1,5 +1,9 @@
 package com.gluonhq.helloandroid.nfc;
 
+
+//com.gluonhq.helloandroid.nfc.
+
+
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
