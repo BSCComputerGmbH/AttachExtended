@@ -29,10 +29,15 @@ package com.gluonhq.attachextended.nfc.impl;
 
 
 
+
 import com.gluonhq.attachextended.nfc.NfcService;
+
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyStringWrapper;
 
 public class AndroidNfcService implements NfcService {
 
+	private static final ReadOnlyStringWrapper nfcScanResult = new ReadOnlyStringWrapper();
 	
     static {
     	System.loadLibrary("nfc");
@@ -40,13 +45,22 @@ public class AndroidNfcService implements NfcService {
 
     public AndroidNfcService() {
     }
-
+    //native method from service to native
     private native void sendMessage(String message);
 
 	@Override
 	public void doConnect(String optionalDataToSend) {
 		sendMessage(optionalDataToSend);
 		
+	}
+	
+	public static void setResult(String v)
+	{
+		
+		  Platform.runLater(() -> {
+			  System.out.println("AndroidNFCService#setResult " + v);
+			  nfcScanResult.set(v);
+		  });
 	}
     
 }

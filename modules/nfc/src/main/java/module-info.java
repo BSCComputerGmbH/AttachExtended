@@ -28,6 +28,8 @@
 module com.gluonhq.attachextended.nfc {
 
     requires com.gluonhq.attach.util;
+	requires javafx.base;
+	requires javafx.graphics;
 
     exports com.gluonhq.attachextended.nfc;
     exports com.gluonhq.attachextended.nfc.impl to com.gluonhq.attach.util;

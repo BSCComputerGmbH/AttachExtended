@@ -27,9 +27,22 @@
  */
 #include "util.h"
 
+static jclass jGraalNFCScanClass;
+static jmethodID jGraalResultNFCScanMethod;
+
 static jclass jNfcServiceClass;
 static jobject jDalvikNfcService;
 static jmethodID jNfcServiceCallMethod;
+
+
+static void initializeGraalHandles(JNIEnv* env) {
+     ATTACH_LOG_FINE("initializeGraalHandles first");
+     jGraalNFCScanClass = (*env)->NewGlobalRef(env, (*env)->FindClass(env, "com/gluonhq/attachextended/nfc/impl/AndroidNfcService"));
+     ATTACH_LOG_FINE("initializeGraalHandles second");
+     jGraalResultNFCScanMethod = (*env)->GetStaticMethodID(env, jGraalNFCScanClass, "setResult", "(Ljava/lang/String;)V");
+     ATTACH_LOG_FINE("initializeGraalHandles third");
+}
+
 
 static void initializeDalvikHandles() {
     jNfcServiceClass = GET_REGISTER_DALVIK_CLASS(jNfcServiceClass, "com/gluonhq/helloandroid/DalvikNfcService");
@@ -59,6 +72,7 @@ JNI_OnLoad_nfc(JavaVM *vm, void *reserved)
         return JNI_FALSE;
     }
     ATTACH_LOG_FINE("[Nfc Service] Initializing native Nfc from OnLoad");
+    initializeGraalHandles(graalEnv);
     initializeDalvikHandles();
     return JNI_VERSION_1_8;
 #else
@@ -78,3 +92,19 @@ JNIEXPORT void JNICALL Java_com_gluonhq_attachextended_nfc_impl_AndroidNfcServic
     DETACH_DALVIK();
     (*env)->ReleaseStringUTFChars(env, jmessage, messageChars);
 }
+
+//from Android to Application
+JNIEXPORT void JNICALL Java_com_gluonhq_helloandroid_DalvikNfcService_nativeSetMessageToApplication(
+    JNIEnv *env, jobject service, jstring resultFromNFCSensor) {
+    const char *resultChars = (*env)->GetStringUTFChars(env, resultFromNFCSensor, NULL);
+    if (isDebugAttach()) {
+        ATTACH_LOG_FINE("NFCScanResult result %s\n", resultChars);
+    }
+    ATTACH_GRAAL();
+    jstring jresult = (*graalEnv)->NewStringUTF(graalEnv, resultChars);
+    (*graalEnv)->CallStaticVoidMethod(graalEnv, jGraalNFCScanClass, jGraalResultNFCScanMethod, jresult);
+    DETACH_GRAAL();
+    // (*env)->ReleaseStringUTFChars(env, result, resultChars);
+}
+
+

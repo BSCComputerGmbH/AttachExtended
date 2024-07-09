@@ -1,9 +1,8 @@
 package com.gluonhq.helloandroid.nfc;
 
 
-//com.gluonhq.helloandroid.nfc.
 
-
+import com.gluonhq.helloandroid.nfc.Intent.NFC;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -119,9 +118,10 @@ public class NFCActivity extends Activity
                // onNewIntent(new Intent("test"));
                // activity.setResult(Activity.RESULT_OK, (Intent) message.obj);
                //activity.finish();
-                Intent toSendIntent = new Intent("test");
-                toSendIntent.putExtra("Parameter1", "Parameter2");
-
+                Intent toSendIntent = new Intent(NFC.ACTION);
+                toSendIntent.putExtra("requestCode", 10002);   
+                toSendIntent.putExtra("Parameter1", getStringMessage(msgs));
+              
                 this.setResult(RESULT_OK, toSendIntent);
                 //schliesst die Activity was auch notwendig ist, wenn man Bidirektionalität haben will
                 this.finish();
@@ -135,11 +135,42 @@ public class NFCActivity extends Activity
         }
         else
             System.out.println("NFCReceiver#resolveIntent ==> action " +  intent.toString());
+    }
+    
+    private String getStringMessage(NdefMessage[] message)
+    {
+    	  if (message == null || message.length == 0)
+              return "no Message received";
+          StringBuilder sb = new StringBuilder();
+          
+          for(int i = 0; i < message.length; i++)
+          {
+        	  NdefMessage ndfMessage = message[0];
+              sb.append("Describe Content: " + ndfMessage.describeContents() + " record length " + ndfMessage.getRecords().length);
+              sb.append(" ");
+             
+              
+              NdefRecord[] records = ndfMessage.getRecords();
+              //TODO eigentlich müssten hie die Records weitergeben werden
+              
+              System.out.println("getStringMessage > " + records.length);
+              for(int x = 0; x < records.length; x++)
+              {
+                  String plainTextPayload = ""+new String(records[x].getPayload());
+                  sb.append("Record==> ");
+                  sb.append(plainTextPayload);
+                  sb.append(" <==Record");
+                  sb.append(" ");
+              }
 
-
+        	  
+        	  
+          }
+          return sb.toString();
     }
 
 
+    /* TODO raus
     private void displayMsgs(NdefMessage[] message) {
         if (message == null || message.length == 0)
             return;
@@ -169,26 +200,7 @@ public class NFCActivity extends Activity
 
             //textView.setText(message.toString());
         }
-        //textView.setText(sb.toString());
-    }
-
-
-
-    /* TODO raus
-    @Override
-    public void initNFC(String optionalerPinCode) {
-
-    }
-
-    @Override
-    public void addListener(INFCListener iNFCListener) {
-        this.iNFCListener = iNFCListener;
-    }
-
-    @Override
-    public void removeListener(INFCListener iNFCListener) {
-        this.iNFCListener = null;
+      
     }*/
-
-
+  
 }

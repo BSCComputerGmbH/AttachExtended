@@ -38,7 +38,8 @@ import com.gluonhq.helloandroid.nfc.Intent.NFC;
 public class DalvikNfcService {
 
     private static final String TAG = Util.TAG;
-
+    //TODO int wert wie bei SCAN_CODE von Barcodescanservice
+    private static final int NFC_CODE = 10002;
     private final Activity activity;
     private final boolean debug;
     
@@ -60,23 +61,28 @@ public class DalvikNfcService {
     {
     	
     	System.out.println("DalvikNFCService#doConnectWithNFC " + optionalDataToSend);
-    // Gluon eigenes Ding aus dem Util Paket
+    	System.out.println("DalvikNFCService#isDebug          " + Util.isDebug());
+    	// Gluon eigenes Ding aus dem Util Paket
         IntentHandler intentHandler = new IntentHandler(){
 
             @Override
             public void gotActivityResult(int requestCode, int resultCode, Intent intent) {
             	
             	//TODO mit dem Activity Result passt was nicht
-            	
-                System.out.println("DalvikNFCService#gotActivityResult " + intent.toString());
+                System.out.println("DalvikNFCService#gotActivityResult==> requestCode " + requestCode);
+                System.out.println("DalvikNFCService#gotActivityResult==> resultCode  " + resultCode);
                 //TODO nur dann wenn es wirklich auf startActivitForResult hinausläuft.
-                if (resultCode == Activity.RESULT_OK) {
-                    //TODO key String
-                    String result = (String) intent.getExtras().get("SCAN_RESULT");
+                if (requestCode == NFC_CODE && resultCode == Activity.RESULT_OK) {
+                    
+                	 System.out.println("DalvikNFCService#gotActivityResult()");
+                	
+                	
+                	//TODO key String
+                    String resultFromNFCSensor = (String) intent.getExtras().get("Parameter1");
+                 
 
-
-                    //TODO
-                    nativeSetMessageToApplication(result);
+                    System.out.println("DalvikNFCService#nativeSetMessageToApplication: " + resultFromNFCSensor);
+                    nativeSetMessageToApplication(resultFromNFCSensor);
                 }
 
 
@@ -84,19 +90,18 @@ public class DalvikNfcService {
         };
         Util.setOnActivityResultHandler(intentHandler);
         //hier kommt die MainActivity raus
-        System.out.println("DalvikNFC " + this.activity.toString());
-        this.activity.startActivityForResult(intent, Activity.RESULT_OK);
+        System.out.println("DalvikNFC#activity " + this.activity.toString());
+        
+        //Request Code muss hinterlegt sein damit der IntentHandler wieder greift.
+        this.activity.startActivityForResult(intent, NFC_CODE);
 
     }
 
-
-    private void nativeSetMessageToApplication(String resultFromNFCSensor)
-    {
-        //TODO hier wieder die spätere brücke ansprechen
-        //im moment die fakeLib
-        //NativeFakeLibrary.setMessageResult(resultFromNFCSensor);
-
-    }
-
+    /**
+     * call the application with the result of the received nfc message
+     * @param resultFromNFCSensor
+     */
+    private native void nativeSetMessageToApplication(String resultFromNFCSensor);
+  
    
 }
