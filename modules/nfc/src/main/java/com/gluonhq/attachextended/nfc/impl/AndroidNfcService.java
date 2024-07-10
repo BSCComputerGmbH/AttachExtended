@@ -54,6 +54,9 @@ public class AndroidNfcService implements NfcService {
 		
 	}
 	
+	
+	
+	
 	public static void setResult(String v)
 	{
 		
@@ -61,6 +64,12 @@ public class AndroidNfcService implements NfcService {
 			  System.out.println("AndroidNFCService#setResult " + v);
 			  nfcScanResult.set(v);
 		  });
+	}
+	
+	@Override
+	public ReadOnlyStringWrapper getResultObject() 
+	{
+		return nfcScanResult;
 	}
     
 }

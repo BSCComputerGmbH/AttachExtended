@@ -29,6 +29,8 @@ package com.gluonhq.attachextended.nfc.impl;
 
 import com.gluonhq.attachextended.nfc.NfcService;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +42,12 @@ public class DesktopNfcService implements NfcService {
 	public void doConnect(String optionalDataToSend) {
 		// TODO Auto-generated method stub
 		
+	}
+    
+	@Override
+	public ReadOnlyStringWrapper getResultObject() {
+		// TODO Auto-generated method stub
+		return null;
 	}
     
 }

@@ -28,6 +28,9 @@
 package com.gluonhq.attachextended.nfc;
 
 import com.gluonhq.attach.util.Services;
+
+import javafx.beans.property.ReadOnlyStringWrapper;
+
 import java.util.Optional;
 
 public interface NfcService {
@@ -42,4 +45,6 @@ public interface NfcService {
     
     
     public void doConnect(String optionalDataToSend);
+    
+	public ReadOnlyStringWrapper getResultObject();
 }

@@ -29,6 +29,8 @@ package com.gluonhq.attachextended.nfc.impl;
 
 import com.gluonhq.attachextended.nfc.NfcService;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
+
 public class IOSNfcService implements NfcService {
 
     static {
@@ -47,6 +49,12 @@ public class IOSNfcService implements NfcService {
 	public void doConnect(String optionalDataToSend) {
 		// TODO Auto-generated method stub
 		
+	}
+    
+	@Override
+	public ReadOnlyStringWrapper getResultObject() {
+		// TODO Auto-generated method stub
+		return null;
 	}
     
 }
