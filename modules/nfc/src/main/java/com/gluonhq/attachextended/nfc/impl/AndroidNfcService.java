@@ -59,7 +59,6 @@ public class AndroidNfcService implements NfcService {
 	
 	public static void setResult(String v)
 	{
-		
 		  Platform.runLater(() -> {
 			  System.out.println("AndroidNFCService#setResult " + v);
 			  nfcScanResult.set(v);

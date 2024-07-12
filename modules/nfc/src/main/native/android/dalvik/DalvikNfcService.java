@@ -59,9 +59,6 @@ public class DalvikNfcService {
     
     public void doConnectWithNFC(String optionalDataToSend)
     {
-    	
-    	System.out.println("DalvikNFCService#doConnectWithNFC " + optionalDataToSend);
-    	System.out.println("DalvikNFCService#isDebug          " + Util.isDebug());
     	// Gluon eigenes Ding aus dem Util Paket
         IntentHandler intentHandler = new IntentHandler(){
 
@@ -78,7 +75,7 @@ public class DalvikNfcService {
                 	
                 	
                 	//TODO key String
-                    String resultFromNFCSensor = (String) intent.getExtras().get("Parameter1");
+                    String resultFromNFCSensor = (String) intent.getExtras().get("Nfc_Content");
                  
 
                     System.out.println("DalvikNFCService#nativeSetMessageToApplication: " + resultFromNFCSensor);
@@ -89,8 +86,6 @@ public class DalvikNfcService {
             }
         };
         Util.setOnActivityResultHandler(intentHandler);
-        //hier kommt die MainActivity raus
-        System.out.println("DalvikNFC#activity " + this.activity.toString());
         
         //Request Code muss hinterlegt sein damit der IntentHandler wieder greift.
         this.activity.startActivityForResult(intent, NFC_CODE);

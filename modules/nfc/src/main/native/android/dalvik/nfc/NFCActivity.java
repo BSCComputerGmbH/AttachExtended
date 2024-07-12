@@ -14,6 +14,7 @@ import android.os.Parcelable;
 import android.provider.Settings;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.gluonhq.helloandroid.nfc.ContentTags;
 
 //TODO Umbau so, dass alle Informationen wieder zur Applikation gebracht werden und nicht in dieser Ansicht angezeigt werden.
 public class NFCActivity extends Activity
@@ -113,30 +114,82 @@ public class NFCActivity extends Activity
 
             if(msgs != null)
             {
-                System.out.println("NFCReceiver#resolveIntent ==> msgs " +  msgs.length);
-                //TODO messages
-               // onNewIntent(new Intent("test"));
-               // activity.setResult(Activity.RESULT_OK, (Intent) message.obj);
-               //activity.finish();
                 Intent toSendIntent = new Intent(NFC.ACTION);
                 toSendIntent.putExtra("requestCode", 10002);   
-                toSendIntent.putExtra("Parameter1", getStringMessage(msgs));
+                //toSendIntent.putExtra("Nfc_Content", getStringMessage(msgs));
+                toSendIntent.putExtra("Nfc_Content", getTaggedMessageString(msgs));
               
                 this.setResult(RESULT_OK, toSendIntent);
                 //schliesst die Activity was auch notwendig ist, wenn man Bidirektionalität haben will
                 this.finish();
             }
-
-
-            /* Aufbereitung für direkte Anzeige auf Activity
-            if(msgs != null)
-                displayMsgs(msgs);
-            */
         }
         else
             System.out.println("NFCReceiver#resolveIntent ==> action " +  intent.toString());
     }
     
+    private String getTaggedMessageString(NdefMessage[] message)
+    {
+    	
+  	  	if (message == null || message.length == 0)
+  	  		return ContentTags.Notification.getStartTag() + "No message received." + ContentTags.Notification.getEndTag();
+  	  	
+	  	StringBuilder sb = new StringBuilder();
+	  	for(int i = 0; i < message.length; i++)
+	  	{
+	  		  NdefMessage ndfMessage = message[0];
+	  		  sb.append(ContentTags.NdefMessage_Description.getStartTag());
+	  		  sb.append(ndfMessage.describeContents());
+	  		  sb.append(ContentTags.NdefMessage_Description.getEndTag());
+	  		  
+	  		  sb.append(ContentTags.NdefMessage_RecordLength.getStartTag());
+	 		  sb.append(""+ndfMessage.getRecords().length);
+	 		  sb.append(ContentTags.NdefMessage_RecordLength.getEndTag());
+	  		  
+	 		  NdefRecord[] records = ndfMessage.getRecords();
+	 		  for(int x = 0; x < records.length; x++)
+	 		  {
+	 			  //start record
+	 			  sb.append(ContentTags.NdefMessage_Record.getStartTag());
+	 			  //id hex string
+	 			  sb.append(ContentTags.NdefRecord_id.getStartTag());
+	 			  sb.append(ContentTags.bytesToString(records[x].getId()));
+	 			  sb.append(ContentTags.NdefRecord_id.getEndTag());
+	 			  
+	 			  //tnf as short value
+	 			  sb.append(ContentTags.NdefRecord_tnf.getStartTag());
+	 			  sb.append(records[x].getTnf());
+	 			  sb.append(ContentTags.NdefRecord_tnf.getEndTag());
+	 			  
+	 			  //typed hex string
+	 			  sb.append(ContentTags.NdefRecord_type.getStartTag());
+	 			  sb.append(ContentTags.bytesToString(records[x].getType()));
+	 			  sb.append(ContentTags.NdefRecord_type.getEndTag());
+	 			  
+	 			  //payload as hexstring
+	 			  sb.append(ContentTags.NdefRecord_payload.getStartTag());
+	 			  sb.append(ContentTags.bytesToString(records[x].getPayload()));
+	 			  sb.append(ContentTags.NdefRecord_payload.getEndTag());
+	 			  
+	 			  //mimetype as "clear" string
+	 			  sb.append(ContentTags.NdefRecord_mimeType.getStartTag());
+	 			  sb.append(records[x].toMimeType());
+	 			  sb.append(ContentTags.NdefRecord_mimeType.getEndTag());
+	 			  //end record
+	 			  sb.append(ContentTags.NdefMessage_Record.getEndTag());
+	 		  }
+	  		  
+	  	}
+	  	return sb.toString();
+
+    }
+    
+    
+    
+    
+    
+    
+    //TODO how to build the message for transfer to the application
     private String getStringMessage(NdefMessage[] message)
     {
     	  if (message == null || message.length == 0)
@@ -168,39 +221,4 @@ public class NFCActivity extends Activity
           }
           return sb.toString();
     }
-
-
-    /* TODO raus
-    private void displayMsgs(NdefMessage[] message) {
-        if (message == null || message.length == 0)
-            return;
-        StringBuilder sb = new StringBuilder();
-
-
-        for(int i = 0; i < message.length; i++)
-        {
-            NdefMessage ndfMessage = message[0];
-            sb.append("Describe Content: " + ndfMessage.describeContents() + " record length " + ndfMessage.getRecords().length);
-            sb.append('\n');
-
-            NdefRecord[] records = ndfMessage.getRecords();
-            //TODO eigentlich müssten hie die Records weitergeben werden
-
-            for(int x = 0; x < records.length; x++)
-            {
-
-                String plainTextPayload = ""+new String(records[x].getPayload());
-                sb.append("Record==> ");
-                sb.append(plainTextPayload);
-                sb.append(" <==Record");
-                sb.append('\n');
-
-                // GenericPairVO<String, String> weitergabe = new GenericPairVO<String, String>(plainTextPayload, "");
-            }
-
-            //textView.setText(message.toString());
-        }
-      
-    }*/
-  
 }
