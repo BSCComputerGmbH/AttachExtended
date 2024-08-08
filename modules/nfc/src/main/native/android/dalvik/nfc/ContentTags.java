@@ -23,6 +23,9 @@ public enum ContentTags
 	NdefRecord_type("<ndefrecord#type>", "</ndefrecord#type>"),
 	NdefRecord_payload("<ndefrecord#payload>", "</ndefrecord#payload>"),
 	NdefRecord_mimeType("<ndefrecord#mimeType>", "</ndefrecord#mimeType>"),
+	
+	SimpleRequestCall("<simpleRequestCall>", "</simpleRequestCall>"),
+	SequenceRequestCall("<sequenceRequestCall>", "</sequenceRequestCall>"),
 
 	;
 	

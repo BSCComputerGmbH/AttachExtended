@@ -28,7 +28,11 @@ public class NFCActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       // setContentView(R.layout.nfcreicever);
+        Intent intent = getIntent();
+        String optionalerPinCode = intent.getStringExtra("PIN");
+        System.out.println("NFCReceiver#optionalerPinCode " + optionalerPinCode);
+        
+        // setContentView(R.layout.nfcreicever);
 
        // textView = findViewById(R.id.tag_viewer_text);
 

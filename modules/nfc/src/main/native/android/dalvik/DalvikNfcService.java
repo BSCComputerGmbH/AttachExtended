@@ -86,7 +86,7 @@ public class DalvikNfcService {
             }
         };
         Util.setOnActivityResultHandler(intentHandler);
-        
+        intent.putExtra("PIN", optionalDataToSend);
         //Request Code muss hinterlegt sein damit der IntentHandler wieder greift.
         this.activity.startActivityForResult(intent, NFC_CODE);
 
