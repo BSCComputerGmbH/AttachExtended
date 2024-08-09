@@ -133,8 +133,10 @@ public class NFCActivity extends Activity
                 }
                 else
                 {
-                	//TODO 
                 	System.out.println("NFCReceiver#SequenceRequestCall");
+                	
+                	
+                	
                 }
               
                 this.setResult(RESULT_OK, toSendIntent);
