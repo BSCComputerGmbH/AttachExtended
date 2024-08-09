@@ -16,21 +16,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.gluonhq.helloandroid.nfc.ContentTags;
 
+
 //TODO Umbau so, dass alle Informationen wieder zur Applikation gebracht werden und nicht in dieser Ansicht angezeigt werden.
 public class NFCActivity extends Activity
 {
 
     private NfcAdapter nfcAdapter;
 
-    //private TextView textView;
+    private String optionalData;
 
     private PendingIntent pendingIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
-        String optionalerPinCode = intent.getStringExtra("PIN");
-        System.out.println("NFCReceiver#optionalerPinCode " + optionalerPinCode);
+        optionalData = intent.getStringExtra(ContentTags.OPTIONAL_DATA_KEY);
+        
+        System.out.println("NFCReceiver#optionaleData " + optionalData);
         
         // setContentView(R.layout.nfcreicever);
 
@@ -101,6 +103,8 @@ public class NFCActivity extends Activity
                 || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
                 || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action))
         {
+        	
+        	
             System.out.println("NFCReceiver#resolveIntent intentAction " + getIntent().toString());
             System.out.println("NFCReceiver#resolveIntent if Abfrage " );
             Parcelable[] parceableMessages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
@@ -121,7 +125,17 @@ public class NFCActivity extends Activity
                 Intent toSendIntent = new Intent(NFC.ACTION);
                 toSendIntent.putExtra("requestCode", 10002);   
                 //toSendIntent.putExtra("Nfc_Content", getStringMessage(msgs));
-                toSendIntent.putExtra("Nfc_Content", getTaggedMessageString(msgs));
+                
+                if(optionalData.contains(ContentTags.SimpleRequestCall.getStartTag()))
+                {
+                	System.out.println("NFCReceiver#SimpleRequestCall");
+                	toSendIntent.putExtra("Nfc_Content", getTaggedMessageString(msgs));
+                }
+                else
+                {
+                	//TODO 
+                	System.out.println("NFCReceiver#SequenceRequestCall");
+                }
               
                 this.setResult(RESULT_OK, toSendIntent);
                 //schliesst die Activity was auch notwendig ist, wenn man Bidirektionalität haben will
@@ -219,8 +233,6 @@ public class NFCActivity extends Activity
                   sb.append(" <==Record");
                   sb.append(" ");
               }
-
-        	  
         	  
           }
           return sb.toString();

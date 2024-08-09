@@ -32,11 +32,16 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import com.gluonhq.helloandroid.nfc.ContentTags;
 
 import com.gluonhq.helloandroid.nfc.Intent.NFC;
 
 public class DalvikNfcService {
 
+	
+	
+	
+	
     private static final String TAG = Util.TAG;
     //TODO int wert wie bei SCAN_CODE von Barcodescanservice
     private static final int NFC_CODE = 10002;
@@ -86,7 +91,8 @@ public class DalvikNfcService {
             }
         };
         Util.setOnActivityResultHandler(intentHandler);
-        intent.putExtra("PIN", optionalDataToSend);
+        
+        intent.putExtra(ContentTags.OPTIONAL_DATA_KEY, optionalDataToSend);
         //Request Code muss hinterlegt sein damit der IntentHandler wieder greift.
         this.activity.startActivityForResult(intent, NFC_CODE);
 
