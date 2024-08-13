@@ -64,7 +64,6 @@ public class NFCActivity extends Activity
     @Override
     protected void onPause() {
         super.onPause();
-        System.out.println("AndroidTest onPause");
     }
 
     @Override
@@ -133,7 +132,7 @@ public class NFCActivity extends Activity
                 }
                 else
                 {
-                	System.out.println("NFCReceiver#SequenceRequestCall");
+                	System.out.println("NFCReceiver#SequenceRequestCall " + optionalData);
                 	
                 	
                 	
