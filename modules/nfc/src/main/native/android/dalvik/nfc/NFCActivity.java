@@ -15,6 +15,8 @@ import android.provider.Settings;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.gluonhq.helloandroid.nfc.ContentTags;
+import android.nfc.Tag;
+import android.nfc.tech.MifareUltralight;
 
 
 //TODO Umbau so, dass alle Informationen wieder zur Applikation gebracht werden und nicht in dieser Ansicht angezeigt werden.
@@ -25,6 +27,8 @@ public class NFCActivity extends Activity
 
     private String optionalData;
 
+	private Tag receivedTag;
+    
     private PendingIntent pendingIntent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +112,9 @@ public class NFCActivity extends Activity
             System.out.println("NFCReceiver#resolveIntent if Abfrage " );
             Parcelable[] parceableMessages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
             System.out.println("NFCReceiver#resolveIntent ==> parceableMessages " +  parceableMessages.length);
+            receivedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            System.out.println("NFCReceiver#getParceableExtra ==> tag " +  receivedTag);
+          
             NdefMessage[] msgs = null;
 
             if(parceableMessages != null)
@@ -134,6 +141,11 @@ public class NFCActivity extends Activity
                 {
                 	System.out.println("NFCReceiver#SequenceRequestCall " + optionalData);
                 	
+                	//TODO Methode für die Übergabe und anschließend die Sendung veranlassen
+                	
+                	String receivedMessageString = getResultFromNFCCommunication(msgs);
+                	
+                	
                 	
                 	
                 }
@@ -145,6 +157,37 @@ public class NFCActivity extends Activity
         }
         else
             System.out.println("NFCReceiver#resolveIntent ==> action " +  intent.toString());
+    }
+    
+    /**
+     * test nfc communication 
+     * @param message
+     * @return
+     */
+    private String getResultFromNFCCommunication(NdefMessage[] message)
+    {
+    	if (message == null || message.length == 0)
+  	  		return ContentTags.Notification.getStartTag() + "No message received." + ContentTags.Notification.getEndTag();
+    	
+    	StringBuilder sb = new StringBuilder();
+    	for(int i = 0; i < message.length; i++)
+	  	{
+    		 
+    		NdefRecord[] records = message[i].getRecords();
+    		for(int x = 0; x < records.length; x++)
+	        {
+    			if(records[x].toMimeType().contains("text/plain"))
+	            {
+    				//TODO get the extrag tag from intent
+    				
+    				
+	            }
+    			
+	        }
+    		
+	  	}
+    	return "TODO";
+    	
     }
     
     private String getTaggedMessageString(NdefMessage[] message)
