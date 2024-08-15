@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.gluonhq.helloandroid.nfc.ContentTags;
 import android.nfc.Tag;
 import android.nfc.tech.MifareUltralight;
+import java.util.List;
 
 
 //TODO Umbau so, dass alle Informationen wieder zur Applikation gebracht werden und nicht in dieser Ansicht angezeigt werden.
@@ -113,7 +114,7 @@ public class NFCActivity extends Activity
             Parcelable[] parceableMessages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
             System.out.println("NFCReceiver#resolveIntent ==> parceableMessages " +  parceableMessages.length);
             receivedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            System.out.println("NFCReceiver#getParceableExtra ==> tag " +  receivedTag);
+            System.out.println("NFCReceiver#receivedTag ==> tag " +  receivedTag);
           
             NdefMessage[] msgs = null;
 
@@ -178,7 +179,55 @@ public class NFCActivity extends Activity
 	        {
     			if(records[x].toMimeType().contains("text/plain"))
 	            {
-    				//TODO get the extrag tag from intent
+    				
+    				
+    				try
+	            	{
+    					//optionalData
+    					//TODO wie wird die Tech von der Applikation festgelegt?
+        				MifareUltralight mu = MifareUltralight.get(receivedTag);
+        				if(!mu.isConnected())
+            			{
+            				mu.connect();
+            			}
+        				System.out.println("NFCReceiver#mu " + mu.toString());
+        				byte[] response = new byte[256];
+        				
+        				List<GenericPairVO<? extends ARequest, ? extends AResponse>> genericPairList = 
+        						RequestResponseDivier.getGenericPairList(optionalData);
+        				
+        				for(int z = 0; z < genericPairList.size(); z++)
+        				{
+        					ByteArrayRequest byteArrayRequest = (ByteArrayRequest)genericPairList.get(z).getLeft();
+        					response =  mu.transceive(byteArrayRequest.getRequest());
+        					
+        					System.out.println("NFCReceiver#firstReponse " + response.length);
+        					
+        					break;
+        				}
+        				
+        				
+        				
+        				
+        				
+        				
+        				
+        				
+        				
+        				
+        				mu.close();
+        				
+        				
+        				
+	            	}
+    				catch(Exception e)
+    				{
+    					e.printStackTrace();
+    				}
+    				
+    				
+    				
+    				
     				
     				
 	            }

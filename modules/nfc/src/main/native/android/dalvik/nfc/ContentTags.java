@@ -26,6 +26,9 @@ public enum ContentTags
 	SimpleRequestCall("<simpleRequestCall>", "</simpleRequestCall>"),
 	SequenceRequestCall("<sequenceRequestCall>", "</sequenceRequestCall>"),
 
+	Request("<request>", "</request>"),
+	Response("<response>", "</response>"),
+	
 	;
 	
 	private String startTag, endTag;
@@ -55,6 +58,16 @@ public enum ContentTags
         }
         return s;
     }
+	
+	public static String getSequenceStartTag(int valueFromSequence)
+	{
+		return String.format("<sequence:%d>", valueFromSequence);
+	}
+	
+	public static String getSequenceEndTag(int valueFromSequence)
+	{
+		return String.format("</sequence:%d>", valueFromSequence);
+	}
 	
 	public static String getRawContent(String enclosedContent)
 	{
