@@ -146,8 +146,7 @@ public class NFCActivity extends Activity
                 	
                 	String receivedMessageString = getResultFromNFCCommunication(msgs);
                 	
-                	
-                	
+                	toSendIntent.putExtra("Nfc_Content", receivedMessageString);
                 	
                 }
               
@@ -196,6 +195,7 @@ public class NFCActivity extends Activity
         				List<GenericPairVO<? extends ARequest, ? extends AResponse>> genericPairList = 
         						RequestResponseDivier.getGenericPairList(optionalData);
         				
+        				System.out.println("NFCReceiver#genericPairList " + genericPairList.size());
         				for(int z = 0; z < genericPairList.size(); z++)
         				{
         					ByteArrayRequest byteArrayRequest = (ByteArrayRequest)genericPairList.get(z).getLeft();
@@ -203,14 +203,18 @@ public class NFCActivity extends Activity
         					
         					System.out.println("NFCReceiver#firstReponse " + response.length);
         					
-        					break;
+        					boolean testVergleich = ((ByteArrayResponse)genericPairList.get(z).getRight()).isExpectedResponse(ByteArrayResponse.toObjectArray(response));
+        					System.out.println("NFCReceiver#testVergleich " + testVergleich);
+        					if(testVergleich)
+        						System.out.println("NFCReceiver#IstGleich");
+        					else
+        					{
+        						//TODO cheesy
+        						System.out.println("NFCReceiver#IstUngleich");
+        						return ContentTags.bytesToString(response).toString();
+        					
+        					}
         				}
-        				
-        				
-        				
-        				
-        				
-        				
         				
         				
         				
@@ -223,16 +227,12 @@ public class NFCActivity extends Activity
     				catch(Exception e)
     				{
     					e.printStackTrace();
+    					
+        				System.out.println("NFCReceiver#Exception " + e.getMessage());
+    				
     				}
-    				
-    				
-    				
-    				
-    				
-    				
-	            }
-    			
-	        }
+    			}
+    		}
     		
 	  	}
     	return "TODO";
