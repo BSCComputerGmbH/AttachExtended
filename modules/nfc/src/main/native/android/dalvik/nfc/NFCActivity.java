@@ -200,19 +200,23 @@ public class NFCActivity extends Activity
         				{
         					ByteArrayRequest byteArrayRequest = (ByteArrayRequest)genericPairList.get(z).getLeft();
         					response =  mu.transceive(byteArrayRequest.getRequest());
-        					
+        				
         					System.out.println("NFCReceiver#firstReponse " + response.length);
-        					
-        					boolean testVergleich = ((ByteArrayResponse)genericPairList.get(z).getRight()).isExpectedResponse(ByteArrayResponse.toObjectArray(response));
-        					System.out.println("NFCReceiver#testVergleich " + testVergleich);
-        					if(testVergleich)
-        						System.out.println("NFCReceiver#IstGleich");
+        					AResponse aResponse = genericPairList.get(z).getRight();
+        					if(aResponse.isExpectedResponseToCheck())
+        					{
+        						boolean isEquals = ((ByteArrayResponse)genericPairList.get(z).getRight()).isExpectedResponse(ByteArrayResponse.toObjectArray(response));
+            					System.out.println("NFCReceiver#isEquals " + isEquals);
+            					if(isEquals)
+            						System.out.println("NFCReceiver#IstGleich");
+            					else
+            					{
+            						//TODO error or whate?
+            					}
+        					}
         					else
         					{
-        						//TODO cheesy
-        						System.out.println("NFCReceiver#IstUngleich");
         						return ContentTags.bytesToString(response).toString();
-        					
         					}
         				}
         				
