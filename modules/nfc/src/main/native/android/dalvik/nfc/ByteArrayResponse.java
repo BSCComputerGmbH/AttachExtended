@@ -29,7 +29,7 @@ public class ByteArrayResponse extends AResponse<Byte[]> {
 		{
 			for(int i = 0; i < responseFromSensor.length; i++)
 			{
-				if(responseFromSensor[i] !=  expectedResponse[i])
+				if(responseFromSensor[i].byteValue() !=  expectedResponse[i])
 					return false;
 			}
 			return true;
