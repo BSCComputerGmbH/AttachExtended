@@ -15,7 +15,6 @@ public class RequestResponseDivier {
 		int startIndex = completeMessage.indexOf(ContentTags.SequenceRequestCall.getStartTag());
 		int endIndex = completeMessage.indexOf(ContentTags.SequenceRequestCall.getEndTag());
 		String contentOfTag = completeMessage.substring(ContentTags.SequenceRequestCall.getStartTag().length(), endIndex);
-		System.out.println("contentOfTag " + contentOfTag);
 		
 		//2. alle Sequenzen in einer einer Liste packen GenericPair<Request, Response>
 		int sequenceIndex = 0;
@@ -41,10 +40,10 @@ public class RequestResponseDivier {
 			int endIndexResp = contentOfSequence.indexOf(ContentTags.Response.getEndTag());
 			
 			String contentOfRequest = contentOfSequence.substring(startIndexReq + ContentTags.Request.getStartTag().length(), endIndexReq);
-			System.out.println("contentOfRequest " + contentOfRequest);
+			System.out.println("RequestResponseDivier#contentOfRequest " + contentOfRequest);
 			
 			String contentOfResponse = contentOfSequence.substring(startIndexResp + ContentTags.Response.getStartTag().length(), endIndexResp);
-			System.out.println("contentOfResponse " + contentOfResponse);
+			System.out.println("RequestResponseDivier#contentOfResponse " + contentOfResponse);
 			
 			genericPairList.add(createGenericPair(contentOfRequest, contentOfResponse));
 			

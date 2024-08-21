@@ -246,7 +246,10 @@ public class NFCActivity extends Activity
             						boolean isEquals = ((ByteArrayResponse)genericPairList.get(z).getRight()).isExpectedResponse(ByteArrayResponse.toObjectArray(response));
                 					System.out.println("NFCReceiver#isEquals " + isEquals);
                 					if(isEquals)
+                					{
+                						//nothing to do if equals
                 						System.out.println("NFCReceiver#IstGleich");
+                					}
                 					else
                 					{
                 						//TODO error or whate?
