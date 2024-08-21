@@ -16,8 +16,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.gluonhq.helloandroid.nfc.ContentTags;
 import android.nfc.Tag;
-import android.nfc.tech.MifareUltralight;
 import java.util.List;
+import android.nfc.tech.IsoDep;
+import android.nfc.tech.MifareClassic;
+import android.nfc.tech.MifareUltralight;
+import android.nfc.tech.Ndef;
+import android.nfc.tech.NfcA;
+import android.nfc.tech.NfcB;
+import android.nfc.tech.NfcF;
+import android.nfc.tech.NfcV;
+import android.nfc.tech.TagTechnology;
 
 
 //TODO Umbau so, dass alle Informationen wieder zur Applikation gebracht werden und nicht in dieser Ansicht angezeigt werden.
@@ -55,9 +63,8 @@ public class NFCActivity extends Activity
         pendingIntent = PendingIntent.getActivity(this, 0, new android.content.Intent(this, this.getClass()).addFlags(
                 android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_MUTABLE);
 
-/*
-
-        ActivityResultLauncher<Intent> activity01Launcher =
+        /*
+       ActivityResultLauncher<Intent> activity01Launcher =
                 registerForActivityResult(new
                                 ActivityResultContracts.StartActivityForResult(),
                         (result) -> {
@@ -176,64 +183,89 @@ public class NFCActivity extends Activity
     		NdefRecord[] records = message[i].getRecords();
     		for(int x = 0; x < records.length; x++)
 	        {
+    			//TODO?
     			if(records[x].toMimeType().contains("text/plain"))
 	            {
-    				
+    				TagTechnology tagTechnologyToUse = null;
     				
     				try
 	            	{
-    					//optionalData
-    					//TODO wie wird die Tech von der Applikation festgelegt?
-        				MifareUltralight mu = MifareUltralight.get(receivedTag);
-        				if(!mu.isConnected())
-            			{
-            				mu.connect();
-            			}
-        				System.out.println("NFCReceiver#mu " + mu.toString());
-        				byte[] response = new byte[256];
-        				
-        				List<GenericPairVO<? extends ARequest, ? extends AResponse>> genericPairList = 
-        						RequestResponseDivier.getGenericPairList(optionalData);
-        				
-        				System.out.println("NFCReceiver#genericPairList " + genericPairList.size());
-        				for(int z = 0; z < genericPairList.size(); z++)
-        				{
-        					ByteArrayRequest byteArrayRequest = (ByteArrayRequest)genericPairList.get(z).getLeft();
-        					response =  mu.transceive(byteArrayRequest.getRequest());
-        				
-        					System.out.println("NFCReceiver#firstReponse " + response.length);
-        					AResponse aResponse = genericPairList.get(z).getRight();
-        					if(aResponse.isExpectedResponseToCheck())
-        					{
-        						boolean isEquals = ((ByteArrayResponse)genericPairList.get(z).getRight()).isExpectedResponse(ByteArrayResponse.toObjectArray(response));
-            					System.out.println("NFCReceiver#isEquals " + isEquals);
-            					if(isEquals)
-            						System.out.println("NFCReceiver#IstGleich");
+    					TagTechnologyConstants constant = TagTechnologyConstants.getTagTechnology(optionalData);
+    					System.out.println("NFCReceiver#TagTechnology " + constant);
+    					
+    					switch(constant)
+    					{ 
+	    					case NfcA:
+	                            tagTechnologyToUse = NfcA.get(receivedTag);
+	                            break;
+	                        case NfcB:
+	                            tagTechnologyToUse = NfcB.get(receivedTag);
+	                            break;
+	                        case NfcF:
+	                            tagTechnologyToUse = NfcF.get(receivedTag);
+	                            break;
+	                        case NfcV:
+	                            tagTechnologyToUse = NfcV.get(receivedTag);
+	                            break;
+	                        case IsoDep:
+	                            tagTechnologyToUse = IsoDep.get(receivedTag);
+	                            break;
+	                        case MifareUltralight:
+	                            tagTechnologyToUse = MifareUltralight.get(receivedTag);
+	                            break;
+	                        case MifareClassic:
+	                            tagTechnologyToUse = MifareClassic.get(receivedTag);
+	                            break;
+    					}
+    					
+    					
+    					if(tagTechnologyToUse != null)
+                        {
+    						System.out.println("NFCReceiver#tagTechnologyToUse " + tagTechnologyToUse);
+    						if(!tagTechnologyToUse.isConnected())
+                            {
+                                tagTechnologyToUse.connect();
+                            }
+    						System.out.println("NFCReceiver#tagTechnologyToUse.isConnected " + tagTechnologyToUse.isConnected());
+                            
+    						byte[] response = new byte[256];
+                            
+
+            				List<GenericPairVO<? extends ARequest, ? extends AResponse>> genericPairList = 
+            						RequestResponseDivier.getGenericPairList(optionalData);
+            				
+            				for(int z = 0; z < genericPairList.size(); z++)
+            				{
+            					ByteArrayRequest byteArrayRequest = (ByteArrayRequest)genericPairList.get(z).getLeft();
+            					
+                			    response = sendRequest(constant, tagTechnologyToUse, byteArrayRequest.getRequest());
+                			  
+                			    AResponse aResponse = genericPairList.get(z).getRight();
+            					if(aResponse.isExpectedResponseToCheck())
+            					{
+            						boolean isEquals = ((ByteArrayResponse)genericPairList.get(z).getRight()).isExpectedResponse(ByteArrayResponse.toObjectArray(response));
+                					System.out.println("NFCReceiver#isEquals " + isEquals);
+                					if(isEquals)
+                						System.out.println("NFCReceiver#IstGleich");
+                					else
+                					{
+                						//TODO error or whate?
+                					}
+            					}
             					else
             					{
-            						//TODO error or whate?
+            						return ContentTags.bytesToString(response).toString();
             					}
-        					}
-        					else
-        					{
-        						return ContentTags.bytesToString(response).toString();
-        					}
-        				}
-        				
-        				
-        				
-        				
-        				mu.close();
-        				
-        				
-        				
+            				}
+            				
+            				tagTechnologyToUse.close();
+                        }
+    					
 	            	}
     				catch(Exception e)
     				{
     					e.printStackTrace();
     					
-        				System.out.println("NFCReceiver#Exception " + e.getMessage());
-    				
     				}
     			}
     		}
@@ -333,5 +365,52 @@ public class NFCActivity extends Activity
         	  
           }
           return sb.toString();
+    }
+    
+    /**
+     * creepy method to send the bytes to the sensor; 
+     * <br>Problem is that the abstract BasicTagTechnology class with the transceive method  not public is
+     * @param constant
+     * @param tagTechnologyToUse
+     * @param bytesToSend
+     * @return
+     */
+    private byte[] sendRequest(TagTechnologyConstants constant, TagTechnology tagTechnologyToUse, byte[] bytesToSend)
+    {
+        byte[] responseValue = new byte[256];
+        try
+        {
+            switch(constant)
+            {
+                case NfcA:
+                    responseValue = ((NfcA)tagTechnologyToUse).transceive(bytesToSend);
+                    break;
+                case NfcB:
+                    responseValue = ((NfcB)tagTechnologyToUse).transceive(bytesToSend);
+                    break;
+                case NfcF:
+                    responseValue = ((NfcF)tagTechnologyToUse).transceive(bytesToSend);
+                    break;
+                case NfcV:
+                    responseValue = ((NfcV)tagTechnologyToUse).transceive(bytesToSend);
+                    break;
+                case IsoDep:
+                    responseValue = ((IsoDep)tagTechnologyToUse).transceive(bytesToSend);
+                    break;
+                case MifareUltralight:
+                    responseValue = ((MifareUltralight)tagTechnologyToUse).transceive(bytesToSend);
+                    break;
+                case MifareClassic:
+                    responseValue = ((MifareClassic)tagTechnologyToUse).transceive(bytesToSend);
+                    break;
+
+            }
+
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        return responseValue;
     }
 }

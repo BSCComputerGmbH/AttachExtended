@@ -29,6 +29,11 @@ public enum ContentTags
 	Request("<request>", "</request>"),
 	Response("<response>", "</response>"),
 	
+	/**
+	 * the connection to the sensor or whatever
+	 */
+	IO_OPERATIONS("<io_operations>", "</io_operations>"),
+	
 	;
 	
 	private String startTag, endTag;
