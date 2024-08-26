@@ -138,23 +138,17 @@ public class NFCActivity extends Activity
             {
                 Intent toSendIntent = new Intent(NFC.ACTION);
                 toSendIntent.putExtra("requestCode", 10002);   
-                //toSendIntent.putExtra("Nfc_Content", getStringMessage(msgs));
                 
                 if(optionalData.contains(ContentTags.SimpleRequestCall.getStartTag()))
                 {
-                	System.out.println("NFCReceiver#SimpleRequestCall");
                 	toSendIntent.putExtra("Nfc_Content", getTaggedMessageString(msgs));
                 }
                 else
                 {
-                	System.out.println("NFCReceiver#SequenceRequestCall " + optionalData);
-                	
-                	//TODO Methode für die Übergabe und anschließend die Sendung veranlassen
-                	
+                	//way with request messages
                 	String receivedMessageString = getResultFromNFCCommunication(msgs);
-                	
+                	System.out.println("NFCReceiver#buildedString " + receivedMessageString);
                 	toSendIntent.putExtra("Nfc_Content", receivedMessageString);
-                	
                 }
               
                 this.setResult(RESULT_OK, toSendIntent);
@@ -166,11 +160,7 @@ public class NFCActivity extends Activity
             System.out.println("NFCReceiver#resolveIntent ==> action " +  intent.toString());
     }
     
-    /**
-     * test nfc communication 
-     * @param message
-     * @return
-     */
+    
     private String getResultFromNFCCommunication(NdefMessage[] message)
     {
     	if (message == null || message.length == 0)
@@ -179,7 +169,171 @@ public class NFCActivity extends Activity
     	StringBuilder sb = new StringBuilder();
     	for(int i = 0; i < message.length; i++)
 	  	{
-    		 
+    		  NdefMessage ndfMessage = message[0];
+	  		  sb.append(ContentTags.NdefMessage_Description.getStartTag());
+	  		  sb.append(ndfMessage.describeContents());
+	  		  sb.append(ContentTags.NdefMessage_Description.getEndTag());
+	  		  
+	  		  sb.append(ContentTags.NdefMessage_RecordLength.getStartTag());
+	 		  sb.append(""+ndfMessage.getRecords().length);
+	 		  sb.append(ContentTags.NdefMessage_RecordLength.getEndTag());
+	  		  
+	 		  NdefRecord[] records = ndfMessage.getRecords();
+	 		  for(int x = 0; x < records.length; x++)
+	 		  {
+	 			 //start record
+	 			  sb.append(ContentTags.NdefMessage_Record.getStartTag());
+	 			  //id hex string
+	 			  sb.append(ContentTags.NdefRecord_id.getStartTag());
+	 			  sb.append(ContentTags.bytesToString(records[x].getId()));
+	 			  sb.append(ContentTags.NdefRecord_id.getEndTag());
+	 			  
+	 			  //tnf as short value
+	 			  sb.append(ContentTags.NdefRecord_tnf.getStartTag());
+	 			  sb.append(records[x].getTnf());
+	 			  sb.append(ContentTags.NdefRecord_tnf.getEndTag());
+	 			  
+	 			  //typed hex string
+	 			  sb.append(ContentTags.NdefRecord_type.getStartTag());
+	 			  sb.append(ContentTags.bytesToString(records[x].getType()));
+	 			  sb.append(ContentTags.NdefRecord_type.getEndTag());
+	 			  
+	 			  //payload as hexstring
+	 			  sb.append(ContentTags.NdefRecord_payload.getStartTag());
+	 			  sb.append(ContentTags.bytesToString(records[x].getPayload()));
+	 			  sb.append(ContentTags.NdefRecord_payload.getEndTag());
+	 			  
+	 			  //mimetype as "clear" string
+	 			  sb.append(ContentTags.NdefRecord_mimeType.getStartTag());
+	 			  sb.append(records[x].toMimeType());
+	 			  sb.append(ContentTags.NdefRecord_mimeType.getEndTag());
+	 			
+	 			 
+	 			  
+	 			  //send request sequence to nfc and add the response to the record field
+	 			  //TODO?
+	 			  if(records[x].toMimeType().contains("text/plain"))
+	 			  {
+	 				  TagTechnology tagTechnologyToUse = null;
+	 				  
+	 				  try
+	 				  {
+	 					  	TagTechnologyConstants constant = TagTechnologyConstants.getTagTechnology(optionalData);
+	    					System.out.println("NFCReceiver#TagTechnology " + constant);
+	    					
+	    					switch(constant)
+	    					{ 
+		    					case NfcA:
+		                            tagTechnologyToUse = NfcA.get(receivedTag);
+		                            break;
+		                        case NfcB:
+		                            tagTechnologyToUse = NfcB.get(receivedTag);
+		                            break;
+		                        case NfcF:
+		                            tagTechnologyToUse = NfcF.get(receivedTag);
+		                            break;
+		                        case NfcV:
+		                            tagTechnologyToUse = NfcV.get(receivedTag);
+		                            break;
+		                        case IsoDep:
+		                            tagTechnologyToUse = IsoDep.get(receivedTag);
+		                            break;
+		                        case MifareUltralight:
+		                            tagTechnologyToUse = MifareUltralight.get(receivedTag);
+		                            break;
+		                        case MifareClassic:
+		                            tagTechnologyToUse = MifareClassic.get(receivedTag);
+		                            break;
+	    					}
+	    					
+	    					if(tagTechnologyToUse != null)
+	                        {
+	    						System.out.println("NFCReceiver#tagTechnologyToUse " + tagTechnologyToUse);
+	    						if(!tagTechnologyToUse.isConnected())
+	                            {
+	                                tagTechnologyToUse.connect();
+	                            }
+	    						System.out.println("NFCReceiver#tagTechnologyToUse.isConnected " + tagTechnologyToUse.isConnected());
+	                            
+	    						byte[] response = new byte[256];
+	                            
+
+	            				List<GenericPairVO<? extends ARequest, ? extends AResponse>> genericPairList = 
+	            						RequestResponseDivier.getGenericPairList(optionalData);
+	            				
+	            				for(int z = 0; z < genericPairList.size(); z++)
+	            				{
+	            					ByteArrayRequest byteArrayRequest = (ByteArrayRequest)genericPairList.get(z).getLeft();
+	            					
+	                			    response = sendRequest(constant, tagTechnologyToUse, byteArrayRequest.getRequest());
+	                			  
+	                			    AResponse aResponse = genericPairList.get(z).getRight();
+	            					if(aResponse.isExpectedResponseToCheck())
+	            					{
+	            						boolean isEquals = ((ByteArrayResponse)genericPairList.get(z).getRight()).isExpectedResponse(ByteArrayResponse.toObjectArray(response));
+	                					System.out.println("NFCReceiver#isEquals " + isEquals);
+	                					if(isEquals)
+	                					{
+	                						//nothing to do if equals
+	                						System.out.println("NFCReceiver#IstGleich");
+	                					}
+	                					else
+	                					{
+	                						sb.append(ContentTags.NdefRecord_respone_error.getStartTag());
+		            						sb.append("error expected response was different: ");
+	                						sb.append(ContentTags.bytesToString(response).toString());
+		            						sb.append(ContentTags.NdefRecord_respone_error.getEndTag());
+	                					}
+	            					}
+	            					else
+	            					{
+	            						sb.append(ContentTags.NdefRecord_response_content.getStartTag());
+	            						sb.append(ContentTags.bytesToString(response).toString());
+	            						sb.append(ContentTags.NdefRecord_response_content.getEndTag());
+	            					}
+	            				}
+	            				
+	            				tagTechnologyToUse.close();
+	                        }
+	 					 
+	 				  }
+	 				  catch(Exception e)
+	 				  {
+		 					sb.append(ContentTags.NdefRecord_respone_error.getStartTag());
+	 						sb.append("error stacktrace: ");
+	 						sb.append(e.getMessage());
+	 						sb.append(ContentTags.NdefRecord_respone_error.getEndTag());
+	 				  }
+	 				 
+	 		
+	 			  }
+	 			  //end record
+	 			 sb.append(ContentTags.NdefMessage_Record.getEndTag());
+	 			  
+	 		  }
+    		
+	  	}
+    	
+    	
+    	//Complete return value
+    	return sb.toString();
+    }
+    
+    
+    
+    /**
+     * test nfc communication 
+     * @param message
+     * @return
+     */
+    private String getResultFromNFCCommunicationOld(NdefMessage[] message)
+    {
+    	if (message == null || message.length == 0)
+  	  		return ContentTags.Notification.getStartTag() + "No message received." + ContentTags.Notification.getEndTag();
+    	
+    	StringBuilder sb = new StringBuilder();
+    	for(int i = 0; i < message.length; i++)
+	  	{
     		NdefRecord[] records = message[i].getRecords();
     		for(int x = 0; x < records.length; x++)
 	        {

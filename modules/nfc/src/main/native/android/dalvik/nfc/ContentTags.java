@@ -1,7 +1,7 @@
 package com.gluonhq.helloandroid.nfc;
 
 /**
- * TODO hier und in der Applikation definiert...eigene Library?
+ * the received nfc content is enclosed with tags for the different types
  * @author mg
  *
  */
@@ -9,7 +9,7 @@ public enum ContentTags
 {
 	//E.g. to send a error message to the application 
 	Notification("<notification>",  "</notification>"),
-		
+	
 	//Tags in Reihenfolge der Zeichenkette hier definieren
 	NdefMessage_Description("<ndefmessage#description>", "</ndefmessage#description>"),
 	NdefMessage_RecordLength("<ndefmessage#recordlength>", "</ndefmessage#recordlength>"),
@@ -22,10 +22,15 @@ public enum ContentTags
 	NdefRecord_type("<ndefrecord#type>", "</ndefrecord#type>"),
 	NdefRecord_payload("<ndefrecord#payload>", "</ndefrecord#payload>"),
 	NdefRecord_mimeType("<ndefrecord#mimeType>", "</ndefrecord#mimeType>"),
-	
-	SimpleRequestCall("<simpleRequestCall>", "</simpleRequestCall>"),
-	SequenceRequestCall("<sequenceRequestCall>", "</sequenceRequestCall>"),
+	//optional tags for the response, if user send request to nfc
+	NdefRecord_response_content("<ndefrecord#response_content>", "</ndefrecord#response_content>"),
+	NdefRecord_respone_error("<ndefrecord#response_error>", "</ndefrecord#response_error>"),
 
+	//request with no bidirectional messaging with the nfc
+	SimpleRequestCall("<simpleRequestCall>", "</simpleRequestCall>"),
+	//request with call a sequence of request to the nfc
+	SequenceRequestCall("<sequenceRequestCall>", "</sequenceRequestCall>"),
+	//use, if sequence request calls
 	Request("<request>", "</request>"),
 	Response("<response>", "</response>"),
 	
@@ -55,7 +60,6 @@ public enum ContentTags
 		return endTag;
 	}
 	
-	
 	public static StringBuilder bytesToString(byte[] bs) {
         StringBuilder s = new StringBuilder();
         for (byte b : bs) {
@@ -63,6 +67,16 @@ public enum ContentTags
         }
         return s;
     }
+	
+	public static String hexStringToString(String hexStr)
+	{
+		StringBuilder output = new StringBuilder("");
+	    for (int i = 0; i < hexStr.length(); i += 2) {
+	        String str = hexStr.substring(i, i + 2);
+	        output.append((char) Integer.parseInt(str, 16));
+	    }
+		return output.toString();
+	}
 	
 	public static String getSequenceStartTag(int valueFromSequence)
 	{
