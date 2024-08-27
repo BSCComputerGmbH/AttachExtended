@@ -28,7 +28,6 @@ import android.nfc.tech.NfcV;
 import android.nfc.tech.TagTechnology;
 
 
-//TODO Umbau so, dass alle Informationen wieder zur Applikation gebracht werden und nicht in dieser Ansicht angezeigt werden.
 public class NFCActivity extends Activity
 {
 
@@ -46,31 +45,17 @@ public class NFCActivity extends Activity
         optionalData = intent.getStringExtra(ContentTags.OPTIONAL_DATA_KEY);
         
         System.out.println("NFCReceiver#optionaleData " + optionalData);
-        
-        // setContentView(R.layout.nfcreicever);
-
-       // textView = findViewById(R.id.tag_viewer_text);
-
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         //TODO Methode die das null nach "oben" befördert bzw. die Fehlermeldung
-        System.out.println("NFCReceiver ==> Adapter1: " + nfcAdapter);
+        System.out.println("NFCReceiver#Adapter: " + nfcAdapter);
         if (nfcAdapter == null) {
             Toast.makeText(this, "No NFC", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
-        System.out.println("NFCReceiver ==> Adapter2: " + nfcAdapter);
         pendingIntent = PendingIntent.getActivity(this, 0, new android.content.Intent(this, this.getClass()).addFlags(
                 android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_MUTABLE);
 
-        /*
-       ActivityResultLauncher<Intent> activity01Launcher =
-                registerForActivityResult(new
-                                ActivityResultContracts.StartActivityForResult(),
-                        (result) -> {
-                            System.out.println("result incoming " );
-                        }
-                );*/
     }
 
     @Override
@@ -89,8 +74,6 @@ public class NFCActivity extends Activity
 
                 showWirelessSettings();
             }
-
-            System.out.println("AndroidTest onResume enableForegroundDispatch " + nfcAdapter);
             nfcAdapter.enableForegroundDispatch(this, pendingIntent, null, null);
         }
     }
@@ -117,11 +100,9 @@ public class NFCActivity extends Activity
         	
         	
             System.out.println("NFCReceiver#resolveIntent intentAction " + getIntent().toString());
-            System.out.println("NFCReceiver#resolveIntent if Abfrage " );
             Parcelable[] parceableMessages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-            System.out.println("NFCReceiver#resolveIntent ==> parceableMessages " +  parceableMessages.length);
             receivedTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            System.out.println("NFCReceiver#receivedTag ==> tag " +  receivedTag);
+            System.out.println("NFCReceiver#receivedTag " +  receivedTag);
           
             NdefMessage[] msgs = null;
 
@@ -143,6 +124,7 @@ public class NFCActivity extends Activity
                 {
                 	toSendIntent.putExtra("Nfc_Content", getTaggedMessageString(msgs));
                 }
+                //sequence request
                 else
                 {
                 	//way with request messages
@@ -170,46 +152,17 @@ public class NFCActivity extends Activity
     	for(int i = 0; i < message.length; i++)
 	  	{
     		  NdefMessage ndfMessage = message[0];
-	  		  sb.append(ContentTags.NdefMessage_Description.getStartTag());
-	  		  sb.append(ndfMessage.describeContents());
-	  		  sb.append(ContentTags.NdefMessage_Description.getEndTag());
-	  		  
-	  		  sb.append(ContentTags.NdefMessage_RecordLength.getStartTag());
-	 		  sb.append(""+ndfMessage.getRecords().length);
-	 		  sb.append(ContentTags.NdefMessage_RecordLength.getEndTag());
-	  		  
+    		  //content of ndfmessage
+    		  sb.append(getNdfMessageContent(ndfMessage));
+    		  
 	 		  NdefRecord[] records = ndfMessage.getRecords();
 	 		  for(int x = 0; x < records.length; x++)
 	 		  {
-	 			 //start record
+	 			  //start record
 	 			  sb.append(ContentTags.NdefMessage_Record.getStartTag());
-	 			  //id hex string
-	 			  sb.append(ContentTags.NdefRecord_id.getStartTag());
-	 			  sb.append(ContentTags.bytesToString(records[x].getId()));
-	 			  sb.append(ContentTags.NdefRecord_id.getEndTag());
-	 			  
-	 			  //tnf as short value
-	 			  sb.append(ContentTags.NdefRecord_tnf.getStartTag());
-	 			  sb.append(records[x].getTnf());
-	 			  sb.append(ContentTags.NdefRecord_tnf.getEndTag());
-	 			  
-	 			  //typed hex string
-	 			  sb.append(ContentTags.NdefRecord_type.getStartTag());
-	 			  sb.append(ContentTags.bytesToString(records[x].getType()));
-	 			  sb.append(ContentTags.NdefRecord_type.getEndTag());
-	 			  
-	 			  //payload as hexstring
-	 			  sb.append(ContentTags.NdefRecord_payload.getStartTag());
-	 			  sb.append(ContentTags.bytesToString(records[x].getPayload()));
-	 			  sb.append(ContentTags.NdefRecord_payload.getEndTag());
-	 			  
-	 			  //mimetype as "clear" string
-	 			  sb.append(ContentTags.NdefRecord_mimeType.getStartTag());
-	 			  sb.append(records[x].toMimeType());
-	 			  sb.append(ContentTags.NdefRecord_mimeType.getEndTag());
-	 			
+	 			  //content of ndfrecord
+	 			  sb.append(getNdfRecordContent(records[x]));
 	 			 
-	 			  
 	 			  //send request sequence to nfc and add the response to the record field
 	 			  //TODO?
 	 			  if(records[x].toMimeType().contains("text/plain"))
@@ -319,118 +272,66 @@ public class NFCActivity extends Activity
     	return sb.toString();
     }
     
-    
-    
     /**
-     * test nfc communication 
-     * @param message
+     * from NdefMessage object to String
+     * @param ndfMessage
      * @return
      */
-    private String getResultFromNFCCommunicationOld(NdefMessage[] message)
+    private String getNdfMessageContent(NdefMessage ndfMessage)
     {
-    	if (message == null || message.length == 0)
-  	  		return ContentTags.Notification.getStartTag() + "No message received." + ContentTags.Notification.getEndTag();
+    	StringBuilder builder = new StringBuilder();
+    	 
+    	builder.append(ContentTags.NdefMessage_Description.getStartTag());
+    	builder.append(ndfMessage.describeContents());
+    	builder.append(ContentTags.NdefMessage_Description.getEndTag());
+		  
+    	builder.append(ContentTags.NdefMessage_RecordLength.getStartTag());
+    	builder.append(""+ndfMessage.getRecords().length);
+    	builder.append(ContentTags.NdefMessage_RecordLength.getEndTag());
     	
-    	StringBuilder sb = new StringBuilder();
-    	for(int i = 0; i < message.length; i++)
-	  	{
-    		NdefRecord[] records = message[i].getRecords();
-    		for(int x = 0; x < records.length; x++)
-	        {
-    			//TODO?
-    			if(records[x].toMimeType().contains("text/plain"))
-	            {
-    				TagTechnology tagTechnologyToUse = null;
-    				
-    				try
-	            	{
-    					TagTechnologyConstants constant = TagTechnologyConstants.getTagTechnology(optionalData);
-    					System.out.println("NFCReceiver#TagTechnology " + constant);
-    					
-    					switch(constant)
-    					{ 
-	    					case NfcA:
-	                            tagTechnologyToUse = NfcA.get(receivedTag);
-	                            break;
-	                        case NfcB:
-	                            tagTechnologyToUse = NfcB.get(receivedTag);
-	                            break;
-	                        case NfcF:
-	                            tagTechnologyToUse = NfcF.get(receivedTag);
-	                            break;
-	                        case NfcV:
-	                            tagTechnologyToUse = NfcV.get(receivedTag);
-	                            break;
-	                        case IsoDep:
-	                            tagTechnologyToUse = IsoDep.get(receivedTag);
-	                            break;
-	                        case MifareUltralight:
-	                            tagTechnologyToUse = MifareUltralight.get(receivedTag);
-	                            break;
-	                        case MifareClassic:
-	                            tagTechnologyToUse = MifareClassic.get(receivedTag);
-	                            break;
-    					}
-    					
-    					
-    					if(tagTechnologyToUse != null)
-                        {
-    						System.out.println("NFCReceiver#tagTechnologyToUse " + tagTechnologyToUse);
-    						if(!tagTechnologyToUse.isConnected())
-                            {
-                                tagTechnologyToUse.connect();
-                            }
-    						System.out.println("NFCReceiver#tagTechnologyToUse.isConnected " + tagTechnologyToUse.isConnected());
-                            
-    						byte[] response = new byte[256];
-                            
-
-            				List<GenericPairVO<? extends ARequest, ? extends AResponse>> genericPairList = 
-            						RequestResponseDivier.getGenericPairList(optionalData);
-            				
-            				for(int z = 0; z < genericPairList.size(); z++)
-            				{
-            					ByteArrayRequest byteArrayRequest = (ByteArrayRequest)genericPairList.get(z).getLeft();
-            					
-                			    response = sendRequest(constant, tagTechnologyToUse, byteArrayRequest.getRequest());
-                			  
-                			    AResponse aResponse = genericPairList.get(z).getRight();
-            					if(aResponse.isExpectedResponseToCheck())
-            					{
-            						boolean isEquals = ((ByteArrayResponse)genericPairList.get(z).getRight()).isExpectedResponse(ByteArrayResponse.toObjectArray(response));
-                					System.out.println("NFCReceiver#isEquals " + isEquals);
-                					if(isEquals)
-                					{
-                						//nothing to do if equals
-                						System.out.println("NFCReceiver#IstGleich");
-                					}
-                					else
-                					{
-                						//TODO error or whate?
-                					}
-            					}
-            					else
-            					{
-            						return ContentTags.bytesToString(response).toString();
-            					}
-            				}
-            				
-            				tagTechnologyToUse.close();
-                        }
-    					
-	            	}
-    				catch(Exception e)
-    				{
-    					e.printStackTrace();
-    					
-    				}
-    			}
-    		}
-    		
-	  	}
-    	return "TODO";
+    	return builder.toString();
+    }
+    
+    /**
+     * from NdefRecord object to String
+     * @param ndefRecord
+     * @return
+     */
+    private String getNdfRecordContent(NdefRecord ndefRecord)
+    {
+    	StringBuilder builder = new StringBuilder();
+    	
+    	
+		  //id hex string
+    	builder.append(ContentTags.NdefRecord_id.getStartTag());
+    	builder.append(ContentTags.bytesToString(ndefRecord.getId()));
+    	builder.append(ContentTags.NdefRecord_id.getEndTag());
+		  
+		  //tnf as short value
+    	builder.append(ContentTags.NdefRecord_tnf.getStartTag());
+    	builder.append(ndefRecord.getTnf());
+    	builder.append(ContentTags.NdefRecord_tnf.getEndTag());
+		  
+		  //typed hex string
+    	builder.append(ContentTags.NdefRecord_type.getStartTag());
+    	builder.append(ContentTags.bytesToString(ndefRecord.getType()));
+    	builder.append(ContentTags.NdefRecord_type.getEndTag());
+		  
+		  //payload as hexstring
+    	builder.append(ContentTags.NdefRecord_payload.getStartTag());
+    	builder.append(ContentTags.bytesToString(ndefRecord.getPayload()));
+    	builder.append(ContentTags.NdefRecord_payload.getEndTag());
+		  
+		  //mimetype as "clear" string
+    	builder.append(ContentTags.NdefRecord_mimeType.getStartTag());
+    	builder.append(ndefRecord.toMimeType());
+    	builder.append(ContentTags.NdefRecord_mimeType.getEndTag());
+    	
+    	return builder.toString();
     	
     }
+    
+    
     
     private String getTaggedMessageString(NdefMessage[] message)
     {
@@ -442,43 +343,16 @@ public class NFCActivity extends Activity
 	  	for(int i = 0; i < message.length; i++)
 	  	{
 	  		  NdefMessage ndfMessage = message[0];
-	  		  sb.append(ContentTags.NdefMessage_Description.getStartTag());
-	  		  sb.append(ndfMessage.describeContents());
-	  		  sb.append(ContentTags.NdefMessage_Description.getEndTag());
 	  		  
-	  		  sb.append(ContentTags.NdefMessage_RecordLength.getStartTag());
-	 		  sb.append(""+ndfMessage.getRecords().length);
-	 		  sb.append(ContentTags.NdefMessage_RecordLength.getEndTag());
+	  		  sb.append(getNdfMessageContent(ndfMessage));
 	  		  
 	 		  NdefRecord[] records = ndfMessage.getRecords();
 	 		  for(int x = 0; x < records.length; x++)
 	 		  {
-	 			  //start record
+	 			 //start record
 	 			  sb.append(ContentTags.NdefMessage_Record.getStartTag());
-	 			  //id hex string
-	 			  sb.append(ContentTags.NdefRecord_id.getStartTag());
-	 			  sb.append(ContentTags.bytesToString(records[x].getId()));
-	 			  sb.append(ContentTags.NdefRecord_id.getEndTag());
-	 			  
-	 			  //tnf as short value
-	 			  sb.append(ContentTags.NdefRecord_tnf.getStartTag());
-	 			  sb.append(records[x].getTnf());
-	 			  sb.append(ContentTags.NdefRecord_tnf.getEndTag());
-	 			  
-	 			  //typed hex string
-	 			  sb.append(ContentTags.NdefRecord_type.getStartTag());
-	 			  sb.append(ContentTags.bytesToString(records[x].getType()));
-	 			  sb.append(ContentTags.NdefRecord_type.getEndTag());
-	 			  
-	 			  //payload as hexstring
-	 			  sb.append(ContentTags.NdefRecord_payload.getStartTag());
-	 			  sb.append(ContentTags.bytesToString(records[x].getPayload()));
-	 			  sb.append(ContentTags.NdefRecord_payload.getEndTag());
-	 			  
-	 			  //mimetype as "clear" string
-	 			  sb.append(ContentTags.NdefRecord_mimeType.getStartTag());
-	 			  sb.append(records[x].toMimeType());
-	 			  sb.append(ContentTags.NdefRecord_mimeType.getEndTag());
+	 			  sb.append(getNdfRecordContent(records[x]));
+	 			
 	 			  //end record
 	 			  sb.append(ContentTags.NdefMessage_Record.getEndTag());
 	 		  }
@@ -488,41 +362,6 @@ public class NFCActivity extends Activity
 
     }
     
-    
-    
-    
-    
-    
-    //TODO how to build the message for transfer to the application
-    private String getStringMessage(NdefMessage[] message)
-    {
-    	  if (message == null || message.length == 0)
-              return "no Message received";
-          StringBuilder sb = new StringBuilder();
-          
-          for(int i = 0; i < message.length; i++)
-          {
-        	  NdefMessage ndfMessage = message[0];
-              sb.append("Describe Content: " + ndfMessage.describeContents() + " record length " + ndfMessage.getRecords().length);
-              sb.append(" ");
-             
-              
-              NdefRecord[] records = ndfMessage.getRecords();
-              //TODO eigentlich müssten hie die Records weitergeben werden
-              
-              System.out.println("getStringMessage > " + records.length);
-              for(int x = 0; x < records.length; x++)
-              {
-                  String plainTextPayload = ""+new String(records[x].getPayload());
-                  sb.append("Record==> ");
-                  sb.append(plainTextPayload);
-                  sb.append(" <==Record");
-                  sb.append(" ");
-              }
-        	  
-          }
-          return sb.toString();
-    }
     
     /**
      * creepy method to send the bytes to the sensor; 

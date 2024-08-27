@@ -70,19 +70,9 @@ public class DalvikNfcService {
             @Override
             public void gotActivityResult(int requestCode, int resultCode, Intent intent) {
             	
-            	//TODO mit dem Activity Result passt was nicht
-                System.out.println("DalvikNFCService#gotActivityResult==> requestCode " + requestCode);
-                System.out.println("DalvikNFCService#gotActivityResult==> resultCode  " + resultCode);
-                //TODO nur dann wenn es wirklich auf startActivitForResult hinausläuft.
-                if (requestCode == NFC_CODE && resultCode == Activity.RESULT_OK) {
-                    
-                	 System.out.println("DalvikNFCService#gotActivityResult()");
-                	
-                	
-                	//TODO key String
+            	if (requestCode == NFC_CODE && resultCode == Activity.RESULT_OK) 
+            	{
                     String resultFromNFCSensor = (String) intent.getExtras().get("Nfc_Content");
-                 
-
                     System.out.println("DalvikNFCService#nativeSetMessageToApplication: " + resultFromNFCSensor);
                     nativeSetMessageToApplication(resultFromNFCSensor);
                 }
