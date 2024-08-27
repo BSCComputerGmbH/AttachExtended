@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#Parameter mg dann andere Umgebung verwenden
+#Parameter mg use other environment
 if [ $1 = "mg" ]
 then
 	echo $1
