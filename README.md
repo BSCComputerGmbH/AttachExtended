@@ -1,4 +1,4 @@
-## Information about Information about the test NFC implementation can be found [here](https://github.com/BSCComputerGmbH/NFCTestApplication) ##
+## Information about the test NFC implementation can be found [here](https://github.com/BSCComputerGmbH/NFCTestApplication) ##
 
 
 
