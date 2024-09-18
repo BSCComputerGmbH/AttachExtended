@@ -1,3 +1,8 @@
+## Information about Information about the test NFC implementation can be found [here](https://github.com/BSCComputerGmbH/NFCTestApplication) ##
+
+
+
+
 # Attach Extended #
 
 Gluon [Attach](http://gluonhq.com/products/mobile/attach/) is the component that addresses the integration with low-level platform APIs in an end-to-end Java Mobile solution.
